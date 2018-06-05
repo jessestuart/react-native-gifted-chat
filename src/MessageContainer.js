@@ -101,7 +101,6 @@ export default class MessageContainer extends React.PureComponent {
           automaticallyAdjustContentInsets={false}
           removeClippedSubviews={Platform.OS === 'android'}
           inverted={this.props.inverted}
-          {...this.props.listViewProps}
           data={this.props.messages}
           style={styles.listStyle}
           contentContainerStyle={styles.contentContainerStyle}
@@ -109,6 +108,7 @@ export default class MessageContainer extends React.PureComponent {
           renderHeader={this.renderFooter}
           renderFooter={this.renderLoadEarlier}
           {...this.props.invertibleScrollViewProps}
+          {...this.props.listViewProps}
           ListFooterComponent={this.renderHeaderWrapper}
         />
       </View>
