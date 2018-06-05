@@ -31,13 +31,7 @@ import Send from './Send';
 import Time from './Time';
 import GiftedAvatar from './GiftedAvatar';
 
-import {
-  MIN_COMPOSER_HEIGHT,
-  MAX_COMPOSER_HEIGHT,
-  DEFAULT_PLACEHOLDER,
-  TIME_FORMAT,
-  DATE_FORMAT,
-} from './Constant';
+import { MIN_COMPOSER_HEIGHT, MAX_COMPOSER_HEIGHT, DEFAULT_PLACEHOLDER, TIME_FORMAT, DATE_FORMAT } from './Constant';
 
 class GiftedChat extends React.Component {
 
@@ -180,7 +174,6 @@ class GiftedChat extends React.Component {
     return this._keyboardHeight;
   }
 
-
   setBottomOffset(value) {
     this._bottomOffset = value;
   }
@@ -217,9 +210,7 @@ class GiftedChat extends React.Component {
 
   // TODO: setMinInputToolbarHeight
   getMinInputToolbarHeight() {
-    return this.props.renderAccessory
-      ? this.props.minInputToolbarHeight * 2
-      : this.props.minInputToolbarHeight;
+    return this.props.renderAccessory ? this.props.minInputToolbarHeight * 2 : this.props.minInputToolbarHeight;
   }
   calculateInputToolbarHeight(composerHeight) {
     return composerHeight + (this.getMinInputToolbarHeight() - MIN_COMPOSER_HEIGHT);
@@ -301,7 +292,6 @@ class GiftedChat extends React.Component {
     this._messageContainerRef.scrollTo({ y: 0, animated });
   }
 
-
   renderMessages() {
     const AnimatedView = this.props.isAnimated === true ? Animated.View : View;
     return (
@@ -314,8 +304,8 @@ class GiftedChat extends React.Component {
           {...this.props}
           invertibleScrollViewProps={this.invertibleScrollViewProps}
           messages={this.getMessages()}
+          renderMarkdown={this.renderMarkdown}
           ref={(component) => (this._messageContainerRef = component)}
-
         />
         {this.renderChatFooter()}
       </AnimatedView>
@@ -448,11 +438,7 @@ class GiftedChat extends React.Component {
     if (this.props.renderInputToolbar) {
       return this.props.renderInputToolbar(inputToolbarProps);
     }
-    return (
-      <InputToolbar
-        {...inputToolbarProps}
-      />
-    );
+    return <InputToolbar {...inputToolbarProps} />;
   }
 
   renderChatFooter() {
@@ -509,7 +495,7 @@ GiftedChat.defaultProps = {
   placeholder: DEFAULT_PLACEHOLDER,
   messageIdGenerator: () => uuid.v4(),
   user: {},
-  onSend: () => { },
+  onSend: () => {},
   locale: null,
   timeFormat: TIME_FORMAT,
   dateFormat: DATE_FORMAT,
@@ -518,7 +504,7 @@ GiftedChat.defaultProps = {
     android: false,
   }),
   loadEarlier: false,
-  onLoadEarlier: () => { },
+  onLoadEarlier: () => {},
   isLoadingEarlier: false,
   renderLoading: null,
   renderLoadEarlier: null,
@@ -545,6 +531,7 @@ GiftedChat.defaultProps = {
   renderComposer: null,
   renderActions: null,
   renderSend: null,
+  renderMarkdown: false,
   renderAccessory: null,
   onPressActionButton: null,
   bottomOffset: 0,
@@ -597,6 +584,7 @@ GiftedChat.propTypes = {
   renderActions: PropTypes.func,
   renderSend: PropTypes.func,
   renderAccessory: PropTypes.func,
+  renderMarkdown: PropTypes.bool,
   onPressActionButton: PropTypes.func,
   bottomOffset: PropTypes.number,
   minInputToolbarHeight: PropTypes.number,
