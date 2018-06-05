@@ -1,6 +1,8 @@
 /* eslint no-use-before-define: ["error", { "variables": false }] */
 import { Linking, StyleSheet, Text, View, ViewPropTypes } from 'react-native';
 import Communications from 'react-native-communications';
+import FitImage from 'react-native-fit-image';
+import Lightbox from 'react-native-lightbox';
 import Markdown from 'react-native-markdown-renderer';
 import ParsedText from 'react-native-parsed-text';
 import PropTypes from 'prop-types';
@@ -65,9 +67,29 @@ export default class MessageText extends React.Component {
   }
 
   renderMarkdown() {
-    const { style, ...restProps } = this.props.markdownProps;
+    const renderLightboxImage = (node, children, parent, styles) => {
+      return (
+        <Lightbox key={node.key}>
+          <View>
+            <FitImage
+              indicator
+              style={styles.image}
+              source={{ uri: node.attributes.src }}
+            />
+          </View>
+        </Lightbox>
+      );
+    };
+
+    const { style, rules, ...restProps } = this.props.markdownProps;
+    const rulesProps = Object.assign({}, { image: renderLightboxImage }, rules);
+
     return (
-      <Markdown style={style[this.props.position]} {...restProps}>
+      <Markdown
+        style={style[this.props.position]}
+        rules={rulesProps}
+        {...restProps}
+      >
         {this.props.currentMessage.text}
       </Markdown>
     );
