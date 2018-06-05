@@ -1,16 +1,14 @@
 /* eslint no-use-before-define: ["error", { "variables": false }] */
+import { Linking, StyleSheet, Text, View, ViewPropTypes } from 'react-native';
+import Communications from 'react-native-communications';
+import Markdown from 'react-native-markdown-renderer';
+import ParsedText from 'react-native-parsed-text';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Linking, StyleSheet, Text, View, ViewPropTypes } from 'react-native';
-
-import ParsedText from 'react-native-parsed-text';
-import Markdown from 'react-native-markdown-renderer';
-import Communications from 'react-native-communications';
 
 const WWW_URL_PATTERN = /^www\./i;
 
 export default class MessageText extends React.Component {
-
   constructor(props) {
     super(props);
     this.onUrlPress = this.onUrlPress.bind(this);
@@ -28,7 +26,7 @@ export default class MessageText extends React.Component {
     if (WWW_URL_PATTERN.test(url)) {
       this.onUrlPress(`http://${url}`);
     } else {
-      Linking.canOpenURL(url).then((supported) => {
+      Linking.canOpenURL(url).then(supported => {
         if (!supported) {
           // eslint-disable-next-line
           console.error('No handler for URL:', url);
@@ -47,7 +45,7 @@ export default class MessageText extends React.Component {
         options,
         cancelButtonIndex,
       },
-      (buttonIndex) => {
+      buttonIndex => {
         switch (buttonIndex) {
           case 0:
             Communications.phonecall(phone, true);
@@ -58,7 +56,7 @@ export default class MessageText extends React.Component {
           default:
             break;
         }
-      },
+      }
     );
   }
 
@@ -67,11 +65,18 @@ export default class MessageText extends React.Component {
   }
 
   renderMarkdown() {
-    return <Markdown>{this.props.currentMessage.text}</Markdown>;
+    return (
+      <Markdown {...this.props.markdownProps}>
+        {this.props.currentMessage.text}
+      </Markdown>
+    );
   }
 
   renderParsedText() {
-    const linkStyle = StyleSheet.flatten([styles[this.props.position].link, this.props.linkStyle[this.props.position]]);
+    const linkStyle = StyleSheet.flatten([
+      styles[this.props.position].link,
+      this.props.linkStyle[this.props.position],
+    ]);
     return (
       <ParsedText
         style={[
@@ -94,12 +99,18 @@ export default class MessageText extends React.Component {
 
   render() {
     return (
-      <View style={[styles[this.props.position].container, this.props.containerStyle[this.props.position]]}>
-        {this.props.renderMarkdown ? this.renderMarkdown() : this.renderParsedText()}
+      <View
+        style={[
+          styles[this.props.position].container,
+          this.props.containerStyle[this.props.position],
+        ]}
+      >
+        {this.props.renderMarkdown
+          ? this.renderMarkdown()
+          : this.renderParsedText()}
       </View>
     );
   }
-
 }
 
 const textStyle = {
@@ -152,6 +163,7 @@ MessageText.defaultProps = {
   textProps: {},
   parsePatterns: () => [],
   renderMarkdown: false,
+  markdownProps: {},
 };
 
 MessageText.propTypes = {
@@ -173,4 +185,5 @@ MessageText.propTypes = {
   textProps: PropTypes.object,
   customTextStyle: Text.propTypes.style,
   renderMarkdown: PropTypes.bool,
+  markdownProps: PropTypes.object,
 };
