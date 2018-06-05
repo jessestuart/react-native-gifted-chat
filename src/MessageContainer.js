@@ -95,8 +95,8 @@ export default class MessageContainer extends React.PureComponent {
     return (
       <View style={styles.container}>
         <FlatList
-          ref={(ref) => (this.flatListRef = ref)}
-          keyExtractor={(item) => item._id}
+          ref={ref => (this.flatListRef = ref)}
+          keyExtractor={item => `item-${item._id}`}
           enableEmptySections
           automaticallyAdjustContentInsets={false}
           removeClippedSubviews={Platform.OS === 'android'}
