@@ -65,8 +65,9 @@ export default class MessageText extends React.Component {
   }
 
   renderMarkdown() {
+    const { style, ...restProps } = this.props.markdownProps;
     return (
-      <Markdown {...this.props.markdownProps}>
+      <Markdown style={style[this.props.position]} {...restProps}>
         {this.props.currentMessage.text}
       </Markdown>
     );
