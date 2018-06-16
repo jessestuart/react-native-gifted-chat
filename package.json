@@ -31,13 +31,12 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "appr": "cd example-expo && ./setPRVersion.js && yarn && yarn appr",
-    "deploy": "cd example-expo && yarn install && exp login --username $EXP_USERNAME --password $EXP_PASSWORD && exp publish --non-interactive"
+    "deploy":
+      "cd example-expo && yarn install && exp login --username $EXP_USERNAME --password $EXP_PASSWORD && exp publish --non-interactive"
   },
   "jest": {
     "preset": "react-native",
-    "setupFiles": [
-      "./tests/setup.js"
-    ],
+    "setupFiles": ["./tests/setup.js"],
     "modulePathIgnorePatterns": [
       "<rootDir>/example",
       "<rootDir>/example-expo",
@@ -60,6 +59,7 @@
     "husky": "0.15.0-rc.2",
     "jest": "22.1.4",
     "prop-types": "15.6.1",
+    "react-test-renderer": "16.4.0",
     "react": "16.2.0",
     "react-native": "0.51.0",
     "react-test-renderer": "16.3.2"
