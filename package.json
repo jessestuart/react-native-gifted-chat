@@ -72,7 +72,7 @@
     "react-native-lightbox": "^0.7.0",
     "react-native-markdown-renderer": "^3.2.6",
     "react-native-parsed-text": "^0.0.20",
-    "uuid": "3.2.1"
+    "uuid": "3.3.0"
   },
   "peerDependencies": {
     "prop-types": "*",
