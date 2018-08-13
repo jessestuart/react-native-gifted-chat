@@ -1,12 +1,12 @@
 {
-  "name": "react-native-gifted-chat",
-  "version": "0.4.3",
+  "name": "@edenhealth/sacred-chat",
+  "version": "0.5.0",
   "description": "The most complete chat UI for React Native",
   "main": "index.js",
   "types": "index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FaridSafi/react-native-gifted-chat.git"
+    "url": "git+https://github.com/jessestuart/react-native-gifted-chat.git"
   },
   "keywords": [
     "android",
@@ -18,12 +18,12 @@
     "message",
     "chat"
   ],
-  "author": "Farid Safi",
+  "author": ["Farid Safi", "Jesse Stuart"],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/FaridSafi/react-native-gifted-chat/issues"
+    "url": "https://github.com/jessestuart/react-native-gifted-chat/issues"
   },
-  "homepage": "https://github.com/FaridSafi/react-native-gifted-chat#readme",
+  "homepage": "https://github.com/jessestuart/react-native-gifted-chat#readme",
   "scripts": {
     "lint": "eslint . --ext .js,.jsx",
     "precommit": "yarn lint",
@@ -31,13 +31,12 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "appr": "cd example-expo && ./setPRVersion.js && yarn && yarn appr",
-    "deploy": "cd example-expo && yarn install && exp login --username $EXP_USERNAME --password $EXP_PASSWORD && exp publish --non-interactive"
+    "deploy":
+      "cd example-expo && yarn install && exp login --username $EXP_USERNAME --password $EXP_PASSWORD && exp publish --non-interactive"
   },
   "jest": {
     "preset": "react-native",
-    "setupFiles": [
-      "./tests/setup.js"
-    ],
+    "setupFiles": ["./tests/setup.js"],
     "modulePathIgnorePatterns": [
       "<rootDir>/example",
       "<rootDir>/example-expo",
