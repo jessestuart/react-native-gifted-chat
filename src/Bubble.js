@@ -1,38 +1,62 @@
-/* eslint no-use-before-define: ["error", { "variables": false }] */
-
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
-import { Text, Clipboard, StyleSheet, TouchableWithoutFeedback, View, ViewPropTypes } from 'react-native';
+import {
+  Text,
+  Clipboard,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
+import _ from 'lodash';
 
 import MessageText from './MessageText';
-import MessageImage from './MessageImage';
+import MessageImageContainer from './MessageImageContainer';
 import Time from './Time';
-import Color from './Color';
 
 import { isSameUser, isSameDay } from './utils';
 
-export default class Bubble extends React.PureComponent {
+import { BubbleStyles as styles } from './styles';
 
+export default class Bubble extends Component {
   constructor(props) {
     super(props);
+    this.onPress = this.onPress.bind(this);
     this.onLongPress = this.onLongPress.bind(this);
+  }
+
+  onPress() {
+    // trigger longpress for failed messages
+    if (
+      this.props.position === 'right' &&
+      this.props.currentMessage.status === 'failed'
+    ) {
+      this.onLongPress();
+    }
   }
 
   onLongPress() {
     if (this.props.onLongPress) {
-      this.props.onLongPress(this.context, this.props.currentMessage);
-    } else if (this.props.currentMessage.text) {
+      this.props.onLongPress(this.context);
+    } else {
       const options = ['Copy Text', 'Cancel'];
+      if (this.props.currentMessage.status === 'failed') {
+        options.unshift('Resend Message');
+      }
+      const retryButtonIndex = options.length - 3;
+      const copyButtonIndex = options.length - 2;
       const cancelButtonIndex = options.length - 1;
       this.context.actionSheet().showActionSheetWithOptions(
         {
           options,
           cancelButtonIndex,
         },
-        (buttonIndex) => {
+        buttonIndex => {
           switch (buttonIndex) {
-            case 0:
+            case copyButtonIndex:
               Clipboard.setString(this.props.currentMessage.text);
+              break;
+            case retryButtonIndex:
+              this.props.retrySend(this.props.currentMessage);
               break;
             default:
               break;
@@ -40,6 +64,24 @@ export default class Bubble extends React.PureComponent {
         },
       );
     }
+  }
+
+  handleStatus() {
+    // change bubble color depending on status for user messages
+    if (this.props.position === 'right') {
+      switch (this.props.currentMessage.status) {
+        case 'pending':
+          if (this.props.showPending) {
+            return styles.pendingBubble;
+          }
+          break;
+        case 'failed':
+          return styles.failedBubble;
+        default:
+          return null;
+      }
+    }
+    return null;
   }
 
   handleBubbleToNext() {
@@ -70,6 +112,7 @@ export default class Bubble extends React.PureComponent {
 
   renderMessageText() {
     if (this.props.currentMessage.text) {
+      // eslint-disable-next-line no-unused-vars
       const { containerStyle, wrapperStyle, ...messageTextProps } = this.props;
       if (this.props.renderMessageText) {
         return this.props.renderMessageText(messageTextProps);
@@ -80,29 +123,42 @@ export default class Bubble extends React.PureComponent {
   }
 
   renderMessageImage() {
-    if (this.props.currentMessage.image) {
-      const { containerStyle, wrapperStyle, ...messageImageProps } = this.props;
-      if (this.props.renderMessageImage) {
-        return this.props.renderMessageImage(messageImageProps);
-      }
-      return <MessageImage {...messageImageProps} />;
+    const {
+      currentMessage: { imageId },
+      renderMessageImage,
+    } = this.props;
+    if (!imageId) {
+      return null;
     }
-    return null;
+    // eslint-disable-next-line no-unused-vars
+    const messageImageProps = _.omit(this.props, [
+      'containerStyle',
+      'wrapperStyle',
+    ]);
+    return renderMessageImage ? (
+      renderMessageImage(messageImageProps)
+    ) : (
+      <MessageImageContainer {...messageImageProps} />
+    );
   }
 
   renderTicks() {
-    const { currentMessage } = this.props;
-    if (this.props.renderTicks) {
+    const { currentMessage, renderTicks, user } = this.props;
+    if (renderTicks) {
       return this.props.renderTicks(currentMessage);
     }
-    if (currentMessage.user._id !== this.props.user._id) {
+    if (_.get(currentMessage, 'user._id') !== _.get(user, '_id')) {
       return null;
     }
     if (currentMessage.sent || currentMessage.received) {
       return (
         <View style={styles.tickView}>
-          {currentMessage.sent && <Text style={[styles.tick, this.props.tickStyle]}>✓</Text>}
-          {currentMessage.received && <Text style={[styles.tick, this.props.tickStyle]}>✓</Text>}
+          {currentMessage.sent && (
+            <Text style={[styles.tick, this.props.tickStyle]}>✓</Text>
+          )}
+          {currentMessage.received && (
+            <Text style={[styles.tick, this.props.tickStyle]}>✓</Text>
+          )}
         </View>
       );
     }
@@ -110,12 +166,27 @@ export default class Bubble extends React.PureComponent {
   }
 
   renderTime() {
-    if (this.props.currentMessage.createdAt) {
+    if (this.props.currentMessage.timestamp) {
+      // eslint-disable-next-line no-unused-vars
       const { containerStyle, wrapperStyle, ...timeProps } = this.props;
       if (this.props.renderTime) {
         return this.props.renderTime(timeProps);
       }
       return <Time {...timeProps} />;
+    }
+    return null;
+  }
+
+  renderAuthorName() {
+    if (
+      this.props.position === 'left' &&
+      !isSameUser(this.props.currentMessage, this.props.previousMessage)
+    ) {
+      const { currentMessage, nameMap } = this.props;
+      const userId = currentMessage.user._id;
+      const displayName =
+        nameMap[userId] || this.props.currentMessage.user.name;
+      return <Text style={styles.authorName}>{displayName}</Text>;
     }
     return null;
   }
@@ -127,18 +198,53 @@ export default class Bubble extends React.PureComponent {
     return null;
   }
 
+  renderStatus() {
+    // never render statuses for left messages
+    if (this.props.position === 'right') {
+      switch (this.props.currentMessage.status) {
+        case 'pending':
+          // group pending notifications together
+          if (
+            this.props.showPending &&
+            this.props.currentMessage.status !== this.props.nextMessage.status
+          ) {
+            return <Text style={[styles.status]}>pending</Text>;
+          }
+          break;
+        case 'failed':
+          return (
+            <Text style={[styles.status, styles.failed]}>
+              Message failed to send. Tap to retry.
+            </Text>
+          );
+        default:
+          return null;
+      }
+    }
+    return null;
+  }
+
   render() {
+    const { position } = this.props;
     return (
-      <View style={[styles[this.props.position].container, this.props.containerStyle[this.props.position]]}>
+      <View
+        style={[
+          styles[this.props.position].container,
+          this.props.containerStyle[this.props.position],
+        ]}
+      >
+        {this.renderAuthorName()}
         <View
           style={[
-            styles[this.props.position].wrapper,
-            this.props.wrapperStyle[this.props.position],
+            styles[position].wrapper,
+            this.props.wrapperStyle[position],
+            this.handleStatus(),
             this.handleBubbleToNext(),
             this.handleBubbleToPrevious(),
           ]}
         >
           <TouchableWithoutFeedback
+            onPress={this.onPress}
             onLongPress={this.onLongPress}
             accessibilityTraits="text"
             {...this.props.touchableProps}
@@ -147,72 +253,18 @@ export default class Bubble extends React.PureComponent {
               {this.renderCustomView()}
               {this.renderMessageImage()}
               {this.renderMessageText()}
-              <View style={[styles.bottom, this.props.bottomContainerStyle[this.props.position]]}>
+              <View style={styles.bottom}>
                 {this.renderTime()}
                 {this.renderTicks()}
               </View>
             </View>
           </TouchableWithoutFeedback>
         </View>
+        {this.renderStatus()}
       </View>
     );
   }
-
 }
-
-const styles = {
-  left: StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: 'flex-start',
-    },
-    wrapper: {
-      borderRadius: 15,
-      backgroundColor: Color.leftBubbleBackground,
-      marginRight: 60,
-      minHeight: 20,
-      justifyContent: 'flex-end',
-    },
-    containerToNext: {
-      borderBottomLeftRadius: 3,
-    },
-    containerToPrevious: {
-      borderTopLeftRadius: 3,
-    },
-  }),
-  right: StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: 'flex-end',
-    },
-    wrapper: {
-      borderRadius: 15,
-      backgroundColor: Color.defaultBlue,
-      marginLeft: 60,
-      minHeight: 20,
-      justifyContent: 'flex-end',
-    },
-    containerToNext: {
-      borderBottomRightRadius: 3,
-    },
-    containerToPrevious: {
-      borderTopRightRadius: 3,
-    },
-  }),
-  bottom: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  tick: {
-    fontSize: 10,
-    backgroundColor: Color.backgroundTransparent,
-    color: Color.white,
-  },
-  tickView: {
-    flexDirection: 'row',
-    marginRight: 10,
-  },
-};
 
 Bubble.contextTypes = {
   actionSheet: PropTypes.func,
@@ -227,53 +279,56 @@ Bubble.defaultProps = {
   renderTicks: null,
   renderTime: null,
   position: 'left',
+  user: { _id: null },
   currentMessage: {
     text: null,
-    createdAt: null,
+    timestamp: null,
     image: null,
+    status: 'ok',
   },
   nextMessage: {},
   previousMessage: {},
   containerStyle: {},
   wrapperStyle: {},
-  bottomContainerStyle: {},
   tickStyle: {},
   containerToNextStyle: {},
   containerToPreviousStyle: {},
+  isSameDay: {},
+  isSameUser: {},
+  retrySend: () => {},
+  showPending: false,
 };
 
 Bubble.propTypes = {
-  user: PropTypes.object.isRequired,
-  touchableProps: PropTypes.object,
-  onLongPress: PropTypes.func,
-  renderMessageImage: PropTypes.func,
-  renderMessageText: PropTypes.func,
-  renderCustomView: PropTypes.func,
-  renderTime: PropTypes.func,
-  renderTicks: PropTypes.func,
-  position: PropTypes.oneOf(['left', 'right']),
-  currentMessage: PropTypes.object,
-  nextMessage: PropTypes.object,
-  previousMessage: PropTypes.object,
   containerStyle: PropTypes.shape({
-    left: ViewPropTypes.style,
-    right: ViewPropTypes.style,
+    left: PropTypes.any,
+    right: PropTypes.any,
   }),
-  wrapperStyle: PropTypes.shape({
-    left: ViewPropTypes.style,
-    right: ViewPropTypes.style,
-  }),
-  bottomContainerStyle: PropTypes.shape({
-    left: ViewPropTypes.style,
-    right: ViewPropTypes.style,
-  }),
-  tickStyle: Text.propTypes.style,
   containerToNextStyle: PropTypes.shape({
-    left: ViewPropTypes.style,
-    right: ViewPropTypes.style,
+    left: PropTypes.any,
+    right: PropTypes.any,
   }),
   containerToPreviousStyle: PropTypes.shape({
-    left: ViewPropTypes.style,
-    right: ViewPropTypes.style,
+    left: PropTypes.any,
+    right: PropTypes.any,
   }),
+  currentMessage: PropTypes.object,
+  isSameDay: PropTypes.func,
+  isSameUser: PropTypes.func,
+  nameMap: PropTypes.object,
+  nextMessage: PropTypes.object,
+  onLongPress: PropTypes.func,
+  position: PropTypes.oneOf(['left', 'right']),
+  previousMessage: PropTypes.object,
+  renderCustomView: PropTypes.func,
+  renderMessageImage: PropTypes.func,
+  renderMessageText: PropTypes.func,
+  renderTicks: PropTypes.func,
+  renderTime: PropTypes.func,
+  retrySend: PropTypes.func,
+  showPending: PropTypes.bool,
+  tickStyle: Text.propTypes.style,
+  touchableProps: PropTypes.object,
+  user: PropTypes.object,
+  wrapperStyle: PropTypes.shape({ left: PropTypes.any, right: PropTypes.any }),
 };

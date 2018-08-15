@@ -8,7 +8,6 @@ import { MIN_COMPOSER_HEIGHT, DEFAULT_PLACEHOLDER } from './Constant';
 import Color from './Color';
 
 export default class Composer extends React.Component {
-
   onContentSizeChange(e) {
     const { contentSize } = e.nativeEvent;
 
@@ -38,10 +37,14 @@ export default class Composer extends React.Component {
         placeholder={this.props.placeholder}
         placeholderTextColor={this.props.placeholderTextColor}
         multiline={this.props.multiline}
-        onChange={(e) => this.onContentSizeChange(e)}
-        onContentSizeChange={(e) => this.onContentSizeChange(e)}
-        onChangeText={(text) => this.onChangeText(text)}
-        style={[styles.textInput, this.props.textInputStyle, { height: this.props.composerHeight }]}
+        onChange={e => this.onContentSizeChange(e)}
+        onContentSizeChange={e => this.onContentSizeChange(e)}
+        onChangeText={text => this.onChangeText(text)}
+        style={[
+          styles.textInput,
+          this.props.textInputStyle,
+          { height: this.props.composerHeight },
+        ]}
         autoFocus={this.props.textInputAutoFocus}
         value={this.props.text}
         enablesReturnKeyAutomatically
@@ -51,7 +54,6 @@ export default class Composer extends React.Component {
       />
     );
   }
-
 }
 
 const styles = StyleSheet.create({

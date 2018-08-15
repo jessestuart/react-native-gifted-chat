@@ -33,7 +33,6 @@ const styles = {
 };
 
 export default class Message extends React.PureComponent {
-
   getInnerComponentProps() {
     const { containerStyle, ...props } = this.props;
     return {
@@ -71,7 +70,10 @@ export default class Message extends React.PureComponent {
   }
 
   renderAvatar() {
-    if (this.props.user._id === this.props.currentMessage.user._id && !this.props.showUserAvatar) {
+    if (
+      this.props.user._id === this.props.currentMessage.user._id &&
+      !this.props.showUserAvatar
+    ) {
       return null;
     }
     const avatarProps = this.getInnerComponentProps();
@@ -83,7 +85,10 @@ export default class Message extends React.PureComponent {
   }
 
   render() {
-    const sameUser = isSameUser(this.props.currentMessage, this.props.nextMessage);
+    const sameUser = isSameUser(
+      this.props.currentMessage,
+      this.props.nextMessage,
+    );
     return (
       <View>
         {this.renderDay()}
@@ -106,7 +111,6 @@ export default class Message extends React.PureComponent {
       </View>
     );
   }
-
 }
 
 Message.defaultProps = {

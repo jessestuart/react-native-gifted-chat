@@ -36,7 +36,6 @@ const styles = {
 };
 
 export default class Avatar extends React.PureComponent {
-
   renderAvatar() {
     if (this.props.renderAvatar) {
       const { renderAvatar, ...avatarProps } = this.props;
@@ -50,14 +49,19 @@ export default class Avatar extends React.PureComponent {
           this.props.imageStyle[this.props.position],
         ])}
         user={this.props.currentMessage.user}
-        onPress={() => this.props.onPressAvatar && this.props.onPressAvatar(this.props.currentMessage.user)}
+        onPress={() =>
+          this.props.onPressAvatar &&
+          this.props.onPressAvatar(this.props.currentMessage.user)
+        }
       />
     );
   }
 
   render() {
     const { renderAvatarOnTop, showAvatarForEveryMessage } = this.props;
-    const messageToCompare = renderAvatarOnTop ? this.props.previousMessage : this.props.nextMessage;
+    const messageToCompare = renderAvatarOnTop
+      ? this.props.previousMessage
+      : this.props.nextMessage;
     const computedStyle = renderAvatarOnTop ? 'onTop' : 'onBottom';
 
     if (this.props.renderAvatar === null) {
@@ -70,7 +74,12 @@ export default class Avatar extends React.PureComponent {
       isSameDay(this.props.currentMessage, messageToCompare)
     ) {
       return (
-        <View style={[styles[this.props.position].container, this.props.containerStyle[this.props.position]]}>
+        <View
+          style={[
+            styles[this.props.position].container,
+            this.props.containerStyle[this.props.position],
+          ]}
+        >
           <GiftedAvatar
             textStyle={this.props.avatarTextStyle[this.props.position]}
             avatarStyle={StyleSheet.flatten([
@@ -94,7 +103,6 @@ export default class Avatar extends React.PureComponent {
       </View>
     );
   }
-
 }
 
 Avatar.defaultProps = {

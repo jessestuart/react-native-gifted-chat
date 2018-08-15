@@ -1,12 +1,12 @@
 {
-  "name": "react-native-gifted-chat",
+  "name": "@jesses/react-native-gifted-chat",
   "version": "0.4.3",
   "description": "The most complete chat UI for React Native",
   "main": "index.js",
   "types": "index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FaridSafi/react-native-gifted-chat.git"
+    "url": "git+https://github.com/jessestuart/react-native-gifted-chat.git"
   },
   "keywords": [
     "android",
@@ -21,9 +21,9 @@
   "author": "Farid Safi",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/FaridSafi/react-native-gifted-chat/issues"
+    "url": "https://github.com/jessestuart/react-native-gifted-chat/issues"
   },
-  "homepage": "https://github.com/FaridSafi/react-native-gifted-chat#readme",
+  "homepage": "https://github.com/jessestuart/react-native-gifted-chat#readme",
   "scripts": {
     "lint": "eslint . --ext .js,.jsx",
     "precommit": "yarn lint",
@@ -31,12 +31,13 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "appr": "cd example-expo && ./setPRVersion.js && yarn && yarn appr",
-    "deploy":
-      "cd example-expo && yarn install && exp login --username $EXP_USERNAME --password $EXP_PASSWORD && exp publish --non-interactive"
+    "deploy": "cd example-expo && yarn install && exp login --username $EXP_USERNAME --password $EXP_PASSWORD && exp publish --non-interactive"
   },
   "jest": {
     "preset": "react-native",
-    "setupFiles": ["./tests/setup.js"],
+    "setupFiles": [
+      "./tests/setup.js"
+    ],
     "modulePathIgnorePatterns": [
       "<rootDir>/example",
       "<rootDir>/example-expo",
@@ -47,19 +48,23 @@
     "@types/react": "^16.0.38",
     "@types/react-native": "^0.52.12",
     "babel": "6.23.0",
+    "babel-eslint": "^8.2.6",
     "babel-jest": "23.0.0",
     "babel-preset-react-native": "4.0.0",
     "eslint": "^4.9.0",
     "eslint-config-airbnb": "16.1.0",
     "eslint-config-cooperka": "0.2.9",
+    "eslint-config-prettier": "^3.0.1",
+    "eslint-plugin-flowtype": "^2.50.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-prettier": "^2.6.2",
     "eslint-plugin-react": "^7.4.0",
     "eslint-plugin-react-native": "3.2.1",
     "husky": "0.15.0-rc.2",
     "jest": "22.1.4",
+    "prettier": "^1.14.2",
     "prop-types": "15.6.2",
-    "react-test-renderer": "16.4.0",
     "react": "16.2.0",
     "react-native": "0.51.0",
     "react-test-renderer": "16.3.2"

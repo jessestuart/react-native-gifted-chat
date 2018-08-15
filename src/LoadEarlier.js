@@ -14,7 +14,6 @@ import {
 import Color from './Color';
 
 export default class LoadEarlier extends React.Component {
-
   renderLoading() {
     if (this.props.isLoadingEarlier === false) {
       return (
@@ -54,7 +53,6 @@ export default class LoadEarlier extends React.Component {
       </TouchableOpacity>
     );
   }
-
 }
 
 const styles = StyleSheet.create({
@@ -86,7 +84,7 @@ const styles = StyleSheet.create({
 });
 
 LoadEarlier.defaultProps = {
-  onLoadEarlier: () => { },
+  onLoadEarlier: () => {},
   isLoadingEarlier: false,
   label: 'Load earlier messages',
   containerStyle: {},
