@@ -1,0 +1,10 @@
+[ver:1,total:1980]
+.gtm/terminal.app:1045,1533834000:180,1534356000:865,r
+package.json:245,1533816000:180,1534356000:65,m
+.eslintrc.js:235,1534356000:235,m
+src/Bubble.js:205,1534356000:205,m
+src/Message.js:70,1534356000:70,m
+.eslintrc:60,1534356000:60,d
+src/MessageText.js:55,1534356000:55,m
+src/styles.js:45,1534356000:45,m
+src/MessageContainer.js:20,1534356000:20,m
